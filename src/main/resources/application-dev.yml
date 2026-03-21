@@ -1,0 +1,27 @@
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /api  # 接口前缀
+  tomcat:
+    uri-encoding: UTF-8
+
+# 数据库配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/feiche_data?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root  # 替换成你的MySQL账号
+    password: AIni,.77  # 替换成你的MySQL密码
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    password:  # 替换成你的Redis密码（无则留空）
+    database: 0
+    timeout: 10000ms
+    lettuce:
+      pool:
+        max-active: 100
+        max-idle: 20
+        min-idle: 5
