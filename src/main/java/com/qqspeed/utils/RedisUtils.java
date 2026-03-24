@@ -18,8 +18,8 @@ public class RedisUtils {
     private RedisTemplate<String, Object> redisTemplate;
 
     // 缓存前缀（避免key冲突）
-    private static final String CAR_CACHE_PREFIX = "feiche:car:";
-    private static final String HOT_CAR_CACHE_KEY = "feiche:car:hot";
+    private static final String CAR_CACHE_PREFIX = "qqspeed:car:";
+//    private static final String HOT_CAR_CACHE_KEY = "qqspeed:car:hot";
 
     /**
      * 设置缓存（带过期时间）
