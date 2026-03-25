@@ -1,4 +1,4 @@
-package com.qqspeed.controller;
+package com.qqspeed.controller.backend;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 赛车接口（后台管理+前台查询）
+ * 赛车接口（后台管理）
  */
 @RestController
-@RequestMapping("/car")
+@RequestMapping("/backend/car")
 @Tag(name = "赛车管理", description = "赛车的CURD接口")
-public class CarController {
+public class CarBackendController {
 
     @Autowired
     private CarService carService;
@@ -32,17 +32,16 @@ public class CarController {
      * @return 分页结果
      */
     @GetMapping("/page")
-    @Operation(summary = "前台分页查赛车", description = "支持名称、等级（T/A/等）、类型、适配模式、" +
-            "上架状态进行筛选，支持按上架时间顺序/倒序排序")
+    @Operation(summary = "后台管理员分页查赛车", description = "支持名称、等级（T/A/等）、类型、适配模式、上架状态进行筛选，支持按上架时间顺序/倒序排序")
     public Result<IPage<CarPageVO>> pageQuery(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "20") Integer pageSize, // 前台每页展示更多
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") Integer pageNum,
+            @Parameter(description = "每页条数") @RequestParam(defaultValue = "20") Integer pageSize,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String level,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String adaptMode,
             @RequestParam(required = false) Integer status,
-            @RequestParam(defaultValue = "desc") String sortDirection // 只有desc和asc两种方式
+            @Parameter(description = "排序方式") @RequestParam(defaultValue = "desc") String sortDirection // 只有desc和asc两种方式
     ) {
         // 1. 构造查询条件
         Car carQuery = new Car();
@@ -54,10 +53,10 @@ public class CarController {
 
         // 2. 查库
         Page<Car> page = new Page<>(pageNum, pageSize);
-        IPage<Car> carPage = carService.pageQuery(page, carQuery, sortDirection);
+        IPage<Car> carIPage = carService.pageQuery(page, carQuery, sortDirection);
 
         // 3. 实体转VO
-        IPage<CarPageVO> carPageVOIPage = carPage.convert(car -> {
+        IPage<CarPageVO> carPageVOIPage = carIPage.convert(car -> {
             CarPageVO carPageVO = new CarPageVO();
             BeanUtils.copyProperties(car, carPageVO);
             return carPageVO;
@@ -67,8 +66,8 @@ public class CarController {
     }
 
     /**
-     * 后台查询单条赛车信息
-     * @param name
+     * 查询单条赛车信息（后台管理）
+     * @param name 赛车名称
      * @return 赛车详情
      */
     @GetMapping("/detail")
@@ -79,43 +78,43 @@ public class CarController {
     }
 
     /**
-     * 新增赛车（后台）
+     * 新增赛车（后台管理）
      * @param carDTO 赛车信息
      * @return 操作结果
      */
-    @PostMapping
+    @PostMapping("/add")
     @Operation(summary = "新增赛车", description = "后台管理员新增赛车信息")
     public Result<?> add(@Parameter(description = "赛车信息") @RequestBody CarDTO carDTO) {
         Car car = new Car();
         BeanUtils.copyProperties(carDTO, car);
         boolean save = carService.save(car);
-        return save ? Result.success() : Result.error("新增失败");
+        return save ? Result.success() : Result.error("新增赛车失败");
     }
 
     /**
-     * 修改赛车（后台）
+     * 修改赛车（后台管理）
      * @param carDTO 赛车信息
      * @return 操作结果
      */
-    @PutMapping
+    @PutMapping("/update")
     @Operation(summary = "修改赛车", description = "后台管理员修改赛车信息")
     public Result<?> update(@Parameter(description = "赛车信息") @RequestBody CarDTO carDTO) {
         Car car = new Car();
         BeanUtils.copyProperties(carDTO, car);
         boolean update = carService.updateByCarName(car);
-        return update ? Result.success() : Result.error("修改失败");
+        return update ? Result.success() : Result.error("修改赛车信息失败");
     }
 
     /**
-     * 删除赛车（后台）
+     * 删除赛车（后台管理）
      * @param name
      * @return 操作结果
      */
-    @DeleteMapping
+    @DeleteMapping("/delete")
     @Operation(summary = "删除赛车", description = "后台管理员删除赛车信息")
-    public Result<?> delete(@RequestParam String name) {
+    public Result<?> delete(@Parameter(description = "赛车名称") @RequestParam String name) {
         boolean remove = carService.removeByCarName(name);
-        return remove ? Result.success() : Result.error("删除失败");
+        return remove ? Result.success() : Result.error("删除赛车失败");
     }
 
 //    /**

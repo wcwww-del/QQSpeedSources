@@ -16,15 +16,15 @@ public interface CarService extends IService<Car> {
      * 分页查询赛车（支持条件筛选，前后台通用）
      * @param page 分页参数
      * @param car 筛选条件（名称、等级、状态）
-     * @return 返回值是每条数据的全部信息，包括ID、创建时间、更新时间、操作人
+     * @return 返回值是每条数据的精简信息
      */
     IPage<Car> pageQuery(Page<Car> page, Car car, String sortDirection);
 
     // ====================== 后台CURD方法 ======================
     /**
-     * 根据赛车名称查询单条赛车信息（后台）
+     * 根据赛车名称查询单条赛车信息（后台管理）
      * @param name 赛车名称
-     * @return 赛车详情
+     * @return 赛车全部信息详情，包含ID、创建时间、更新时间、操作人等
      */
     Car getCarByName(String name);
 

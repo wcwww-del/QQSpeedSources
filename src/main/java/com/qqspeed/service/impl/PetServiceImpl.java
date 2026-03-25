@@ -5,11 +5,19 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qqspeed.common.exception.BusinessException;
+import com.qqspeed.data.dto.CarDTO;
+import com.qqspeed.data.dto.PetDTO;
+import com.qqspeed.data.entity.Car;
 import com.qqspeed.data.entity.Pet;
 import com.qqspeed.mapper.PetMapper;
 import com.qqspeed.service.PetService;
+import com.qqspeed.utils.RedisUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 宠物服务实现类
@@ -17,9 +25,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class PetServiceImpl extends ServiceImpl<PetMapper, Pet> implements PetService {
 
-    /**
-     * 分页查询（支持宠物名称、品级、适配模式、获取方式、状态查询）
-     */
+    @Autowired
+    private RedisUtils redisUtils;
+
+    // ====================== 前后台通用方法 ======================
     @Override
     public IPage<Pet> pageQuery(Page<Pet> page, Pet pet, String sortDirection) {
         // 构造查询条件
@@ -62,22 +71,13 @@ public class PetServiceImpl extends ServiceImpl<PetMapper, Pet> implements PetSe
         return baseMapper.selectPage(page, queryWrapper);
     }
 
-    /**
-     * 根据宠物名称查询单条宠物信息
-     * @param name 宠物名称
-     * @return 宠物详情
-     */
+    // ====================== 后台CURD方法 ======================
     @Override
     public Pet getPetByName(String name) {
         Long id = getIdByName(name);
         return baseMapper.selectById(id);
     }
 
-    /**
-     * 新增宠物（后台管理）
-     * @param pet 宠物信息
-     * @return 操作结果
-     */
     @Override
     public boolean save(Pet pet) {
         // 校验名称重复（唯一索引兜底，业务层再校验）
@@ -87,31 +87,78 @@ public class PetServiceImpl extends ServiceImpl<PetMapper, Pet> implements PetSe
         return super.save(pet);
     }
 
-    /**
-     * 修改宠物（后台管理）
-     * @param pet 宠物信息
-     * @return 操作结果
-     */
+//    已更新新方法
+//    @Override
+//    public boolean updateByPetName(Pet pet) {
+//        // 1. 查ID
+//        Long id = getIdByName(pet.getName());
+//        // 2. 删除对应ID的宠物信息，然后新增更改后的宠物信息
+//        this.removeById(id);
+//        return this.save(pet);
+//    }
+//
+//    @Override
+//    public boolean removeByPetName(String name) {
+//        // 1. 查ID
+//        Long id = getIdByName(name);
+//        // 2. 用ID删除
+//        return this.removeById(id);
+//    }
+
     @Override
     public boolean updateByPetName(Pet pet) {
         // 1. 查ID
         Long id = getIdByName(pet.getName());
         // 2. 删除对应ID的宠物信息，然后新增更改后的宠物信息
         this.removeById(id);
-        return this.save(pet);
+        boolean result = this.save(pet);
+        // 3. 修改后失效缓存
+        String cacheKey = redisUtils.getPetDetailKey(pet.getName());
+        redisUtils.delete(cacheKey);
+//        // 热门宠物缓存也失效（可选，或每天预热）
+//        redisUtils.delete(redisUtils.getHotPetKey());
+        return result;
     }
 
-    /**
-     * 删除操作
-     * @param name
-     * @return 操作结果
-     */
     @Override
     public boolean removeByPetName(String name) {
         // 1. 查ID
         Long id = getIdByName(name);
         // 2. 用ID删除
-        return this.removeById(id);
+        boolean result = this.removeById(id);
+        // 3. 删除后失效缓存
+        String cacheKey = redisUtils.getPetDetailKey(name);
+        redisUtils.delete(cacheKey);
+//        redisUtils.delete(redisUtils.getHotPetKey());
+        return result;
+    }
+
+    // ====================== 前台缓存方法 ======================
+    @Override
+    public PetDTO getPetDetailWithCache(String name) {
+        // 1. 先查缓存
+        String cacheKey = redisUtils.getPetDetailKey(name);
+        PetDTO cacheVO = (PetDTO) redisUtils.get(cacheKey);
+        if (cacheVO != null) {
+            return cacheVO; // 缓存命中，直接返回
+        }
+
+        // 2. 缓存未命中，查库
+        LambdaQueryWrapper<Pet> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Pet::getName, name);
+        Pet pet = this.getOne(queryWrapper);
+        if (pet == null) {
+            throw new BusinessException("未找到该宠物！");
+        }
+
+        // 3. 实体转VO
+        PetDTO petDTO = new PetDTO();
+        BeanUtils.copyProperties(pet, petDTO);
+
+        // 4. 存入缓存（30分钟过期）
+        redisUtils.set(cacheKey, petDTO, 30, TimeUnit.MINUTES);
+
+        return petDTO;
     }
 
     /**

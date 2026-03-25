@@ -27,7 +27,6 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, Car> implements CarSe
     private RedisUtils redisUtils;
 
     // ====================== 前后台通用方法 ======================
-
     @Override
     public IPage<Car> pageQuery(Page<Car> page, Car car, String sortDirection) {
         // 构造查询条件
@@ -72,7 +71,6 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, Car> implements CarSe
     }
 
     // ====================== 后台CURD方法 ======================
-
     @Override
     public Car getCarByName(String name) {
         Long id = getIdByName(name);
@@ -146,7 +144,6 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, Car> implements CarSe
     }
 
     // ====================== 前台缓存方法 ======================
-
     @Override
     public CarDTO getCarDetailWithCache(String name) {
         // 1. 先查缓存
@@ -161,7 +158,7 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, Car> implements CarSe
         queryWrapper.eq(Car::getName, name);
         Car car = this.getOne(queryWrapper);
         if (car == null) {
-            throw new BusinessException("未找到该赛车");
+            throw new BusinessException("未找到该赛车！");
         }
 
         // 3. 实体转VO
@@ -216,6 +213,4 @@ public class CarServiceImpl extends ServiceImpl<CarMapper, Car> implements CarSe
         }
         return car.getId();
     }
-
-
 }

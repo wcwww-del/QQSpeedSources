@@ -21,6 +21,8 @@ public class RedisUtils {
     private static final String CAR_CACHE_PREFIX = "qqspeed:car:";
 //    private static final String HOT_CAR_CACHE_KEY = "qqspeed:car:hot";
 
+    private static final String PET_CACHE_PREFIX = "qqspeed:pet:";
+
     /**
      * 设置缓存（带过期时间）
      */
@@ -56,6 +58,11 @@ public class RedisUtils {
     // 赛车详情缓存key
     public String getCarDetailKey(String carName) {
         return CAR_CACHE_PREFIX + "detail:" + carName;
+    }
+
+    // 宠物详情缓存key
+    public String getPetDetailKey(String petName) {
+        return PET_CACHE_PREFIX + "detail:" + petName;
     }
 
 //    // 热门赛车缓存key

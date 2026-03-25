@@ -1,14 +1,15 @@
-package com.qqspeed.data.dto.petDTO;
+package com.qqspeed.data.vo;
 
 import lombok.Data;
 
 import java.time.LocalDate;
 
 /**
- * 新增/修改/前端用户OV使用的DTO
+ * 前台分页查询展示VO，精简字段
  */
 @Data
-public class PetDTO {
+public class PetPageVO {
+
     /**
      * 宠物名称
      */
@@ -20,24 +21,9 @@ public class PetDTO {
     private String grade;
 
     /**
-     * 满级效果
-     */
-    private String fullLevelEffect;
-
-    /**
      * 适配模式
      */
     private String adaptMode;
-
-    /**
-     * 羁绊
-     */
-    private String relation;
-
-    /**
-     * 上线时间
-     */
-    private LocalDate onlineTime;
 
     /**
      * 获取方式
