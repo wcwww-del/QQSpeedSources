@@ -19,8 +19,6 @@ public class RedisUtils {
 
     // 缓存前缀（避免key冲突）
     private static final String CAR_CACHE_PREFIX = "qqspeed:car:";
-//    private static final String HOT_CAR_CACHE_KEY = "qqspeed:car:hot";
-
     private static final String PET_CACHE_PREFIX = "qqspeed:pet:";
 
     /**

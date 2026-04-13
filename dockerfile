@@ -8,7 +8,7 @@ LABEL maintainer="wangchao <wangchao000413@qq.com>"
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# 创建工作目录
+# 创建工作目录（容器内的）
 WORKDIR /app
 
 # 将本地jar包复制到容器内（注意替换成你的jar包名称）

@@ -1,22 +1,18 @@
-package com.qqspeed.data.entity;
+package com.qqspeed.data.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 /**
- * 系统文件实体类（对应sys_file表）
+ * 系统文件DTO（用于前后台数据传输）
  */
 @Data
-@TableName("sys_file")
-public class SysFile {
+public class SysFileDTO {
+
     /**
-     * 主键：前端完全不可见、不可传
+     * 文件ID
      */
-    @TableId(type = IdType.AUTO) // 数据库自增，优先级最高
-    @JsonIgnore // 序列化/反序列化全程忽略，前端无感知
     private Long id;
 
     /**
@@ -70,7 +66,7 @@ public class SysFile {
     private String uploaderName;
 
     /**
-     * 状态 0-删除 1-正常
+     * 状态
      */
     private Integer status;
 
@@ -85,16 +81,12 @@ public class SysFile {
     private String description;
 
     /**
-     * 创建时间（前端无需传，MyBatis-Plus自动填充）
+     * 创建时间
      */
-    @JsonIgnore // 序列化/反序列化时忽略该字段，前端传了也接收不到
-    @TableField(fill = FieldFill.INSERT) // 仅插入时填充
     private LocalDateTime createTime;
 
     /**
-     * 更新时间（前端无需传，MyBatis-Plus自动填充）
+     * 更新时间
      */
-    @JsonIgnore
-    @TableField(fill = FieldFill.INSERT_UPDATE) // 插入+更新时填充
     private LocalDateTime updateTime;
 }

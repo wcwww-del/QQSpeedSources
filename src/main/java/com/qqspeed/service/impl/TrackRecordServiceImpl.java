@@ -12,7 +12,7 @@ import com.qqspeed.service.TrackRecordService;
 import org.springframework.stereotype.Service;
 
 /**
- * 国服服务实现类
+ * 国服记录服务实现类
  */
 @Service
 public class TrackRecordServiceImpl extends ServiceImpl<TrackRecordMapper, TrackRecord> implements TrackRecordService {
@@ -31,63 +31,64 @@ public class TrackRecordServiceImpl extends ServiceImpl<TrackRecordMapper, Track
             queryWrapper.like(TrackRecord::getTrackMap, trackRecord.getTrackMap());
         }
 
-        // T/A精确查询
-//        if (StringUtils.isNotBlank(trackRecord.get))
-
-        // 车手模糊查询
+        // T车车手模糊查询
         if (StringUtils.isNotBlank(trackRecord.getPlayerNameT())){
             queryWrapper.like(TrackRecord::getPlayerNameT, trackRecord.getPlayerNameT());
         }
 
-        // 赛车名称模糊查询（T）
+        // T车赛车名称模糊查询
         if (StringUtils.isNotBlank(trackRecord.getCarNameT())){
             queryWrapper.like(TrackRecord::getCarNameT, trackRecord.getCarNameT());
         }
 
-        // 宠物模糊查询（T）
+        // T车宠物模糊查询
         if (StringUtils.isNotBlank(trackRecord.getPetNameT())){
             queryWrapper.like(TrackRecord::getPetNameT, trackRecord.getPetNameT());
         }
 
-        // ECU模糊查询（T）
+        // T车ECU模糊查询
         if (StringUtils.isNotBlank(trackRecord.getECUNameT())){
             queryWrapper.like(TrackRecord::getECUNameT, trackRecord.getECUNameT());
         }
 
-        // 创造纪录时间精确查询（T）
+        // T车创造纪录时间精确查询
         if (trackRecord.getRecordTimeDateT() != null){
-            queryWrapper.eq(TrackRecord::getRecordTimeT, trackRecord.getRecordTimeT());
+            queryWrapper.eq(TrackRecord::getRecordTimeDateT, trackRecord.getRecordTimeDateT());
         }
 
-        // 赛车名称模糊查询（A）
+        // A车车手模糊查询
+        if (StringUtils.isNotBlank(trackRecord.getPlayerNameA())){
+            queryWrapper.like(TrackRecord::getPlayerNameA, trackRecord.getPlayerNameA());
+        }
+
+        // A车赛车名称模糊查询
         if (StringUtils.isNotBlank(trackRecord.getCarNameA())){
             queryWrapper.like(TrackRecord::getCarNameA, trackRecord.getCarNameA());
         }
 
-        // 宠物模糊查询（A）
-        if (StringUtils.isNotBlank(trackRecord.getPetNameT())){
-            queryWrapper.like(TrackRecord::getPetNameT, trackRecord.getPetNameT());
+        // A车宠物模糊查询
+        if (StringUtils.isNotBlank(trackRecord.getPetNameA())){
+            queryWrapper.like(TrackRecord::getPetNameA, trackRecord.getPetNameA());
         }
 
-        // ECU模糊查询（A）
-        if (StringUtils.isNotBlank(trackRecord.getECUNameT())){
-            queryWrapper.like(TrackRecord::getECUNameT, trackRecord.getECUNameT());
+        // A车ECU模糊查询
+        if (StringUtils.isNotBlank(trackRecord.getECUNameA())){
+            queryWrapper.like(TrackRecord::getECUNameA, trackRecord.getECUNameA());
         }
 
-        // 创造纪录时间精确查询（A）
+        // A车创造纪录时间精确查询
         if (trackRecord.getRecordTimeDateA() != null){
-            queryWrapper.eq(TrackRecord::getRecordTimeT, trackRecord.getRecordTimeT());
+            queryWrapper.eq(TrackRecord::getRecordTimeDateA, trackRecord.getRecordTimeDateA());
         }
 
-//        // 先校验排序方向参数，避免非法值
-//        if ("desc".equalsIgnoreCase(sortDirection)) {
-//            // 降序：根据星级从大到小
-//            queryWrapper.orderByDesc(TrackRecord::getStar);
-//
-//        } else {
-//            // 升序（默认）：根据星级从小到大
-//            queryWrapper.orderByAsc(Car::getStar);
-//        }
+        // 先校验排序方向参数，避免非法值
+        if ("desc".equalsIgnoreCase(sortDirection)) {
+            // 降序：根据创造纪录时间从晚到早
+            queryWrapper.orderByDesc(TrackRecord::getRecordTimeDateT);
+        } else {
+            // 升序（默认）：根据创造纪录时间从早到晚
+            queryWrapper.orderByAsc(TrackRecord::getRecordTimeDateT);
+        }
 
         return baseMapper.selectPage(page, queryWrapper);
     }
